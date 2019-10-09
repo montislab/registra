@@ -2,25 +2,29 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using RegistraWebApi.Persistance.Repository;
 
 namespace RegistraWebApi.Persistance
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly object context;
+        private readonly RegistraDbContext registraDbContext;
+        public IClientRepository Clients { get; private set; }
 
-        public UnitOfWork(object context)
+        public UnitOfWork(RegistraDbContext registraDbContext,
+                          IClientRepository ClientRepository)
         {
-            this.context = context;
+            this.registraDbContext = registraDbContext;
+            Clients = ClientRepository;
         }
 
         public int SaveChanges()
         {
-            throw new NotImplementedException();
+            return registraDbContext.SaveChanges();
         }
         public void Dispose()
         {
-            throw new NotImplementedException();
+            registraDbContext.Dispose();
         }
     }
 }

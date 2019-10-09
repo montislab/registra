@@ -1,47 +1,53 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
-using static RegistraWebApi.Persistance.Repository.IRepository;
+using RegistraWebApi.Persistance.Repository;
 
 namespace RegistraWebApi.Persistance.Repository
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
-        public void Add(TEntity entity)
-        {
-            throw new NotImplementedException();
-        }
+        protected readonly DbContext DbContext;
 
-        public void AddRange(IEnumerable<TEntity> entities)
+        public Repository(DbContext dbContext)
         {
-            throw new NotImplementedException();
+            this.DbContext = dbContext;
         }
-
-        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public TEntity Get(int id)
         {
-            throw new NotImplementedException();
+            return DbContext.Set<TEntity>().Find(id);
         }
 
         public IEnumerable<TEntity> GetAll()
         {
-            throw new NotImplementedException();
+            return DbContext.Set<TEntity>().ToList();
+        }
+        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
+        {
+            return DbContext.Set<TEntity>().Where(predicate);
+        }
+
+        public void Add(TEntity entity)
+        {
+            DbContext.Set<TEntity>().Add(entity);
+        }
+
+        public void AddRange(IEnumerable<TEntity> entities)
+        {
+            DbContext.Set<TEntity>().AddRange(entities);
         }
 
         public void Remove(TEntity entity)
         {
-            throw new NotImplementedException();
+            DbContext.Set<TEntity>().Remove(entity);
         }
 
         public void RemoveRange(IEnumerable<TEntity> entities)
         {
-            throw new NotImplementedException();
+            DbContext.Set<TEntity>().RemoveRange(entities);
         }
     }
 }

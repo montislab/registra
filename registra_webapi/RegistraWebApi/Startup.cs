@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RegistraWebApi.Persistance;
+using RegistraWebApi.Persistance.Repository;
 
 namespace RegistraWebApi
 {
@@ -28,6 +29,8 @@ namespace RegistraWebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<RegistraDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("RegistraConnectionStringDev")));
+            services.AddScoped<IClientRepository, ClientRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddControllers();
         }
 

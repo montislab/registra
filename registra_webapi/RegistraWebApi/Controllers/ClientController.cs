@@ -13,15 +13,19 @@ namespace RegistraWebApi.Controllers
     [Route("[controller]")]
     public class ClientController : ControllerBase
     {
-        public ClientController(RegistraDbContext registraDbContext)
+        private readonly IUnitOfWork unitOfWork;
+
+        public ClientController(IUnitOfWork unitOfWork)
         {
-            
+            this.unitOfWork = unitOfWork;
         }
 
         [HttpGet]
         public IEnumerable<Client> Get()
         {
-
+            var result = unitOfWork.Clients.GetBestClients().ToList();
+            int cnt = result.Count;
+            return result;
         }
     }
 }
