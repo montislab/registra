@@ -1,0 +1,4 @@
+--DELETE FROM dbo.Clients;
+INSERT INTO dbo.Clients (FirstName, LastName, PhoneNumber) VALUES ('Jan', 'Kowalski', '603 898 185');
+INSERT INTO dbo.Clients (FirstName, LastName, PhoneNumber) VALUES ('Kazek', 'Wynalazek', '895 798 444');
+INSERT INTO dbo.Clients (FirstName, LastName, PhoneNumber) VALUES ('Anna', 'Nowak', '233 744 777');
