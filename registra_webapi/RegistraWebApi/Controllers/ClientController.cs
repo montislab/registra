@@ -23,8 +23,7 @@ namespace RegistraWebApi.Controllers
         [HttpGet]
         public IEnumerable<Client> Get()
         {
-            var result = unitOfWork.Clients.GetBestClients().ToList();
-            int cnt = result.Count;
+            var result = unitOfWork.Clients.GetAll();
             return result;
         }
     }
