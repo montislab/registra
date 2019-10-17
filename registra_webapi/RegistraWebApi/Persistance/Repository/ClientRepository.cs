@@ -9,6 +9,11 @@ namespace RegistraWebApi.Persistance.Repository
 {
     public class ClientRepository : Repository<Client>, IClientRepository
     {
+        public RegistraDbContext RegistraDbContext
+        {
+            get => DbContext as RegistraDbContext;
+        }
+        
         public ClientRepository(RegistraDbContext registraDbContext)
             :base(registraDbContext)
         {
@@ -19,9 +24,5 @@ namespace RegistraWebApi.Persistance.Repository
             return RegistraDbContext.Clients.OrderByDescending(p => p.FirstName).Take(2).ToList();
         }
 
-        public RegistraDbContext RegistraDbContext
-        {
-            get => DbContext as RegistraDbContext;
-        }
     }
 }
