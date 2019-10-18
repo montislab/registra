@@ -22,6 +22,12 @@ namespace RegistraWebApi.Persistance
         {
             return registraDbContext.SaveChanges();
         }
+
+        public async Task<int> SaveChangesAsync()
+        {
+            return await registraDbContext.SaveChangesAsync();
+        }
+
         public void Dispose()
         {
             registraDbContext.Dispose();

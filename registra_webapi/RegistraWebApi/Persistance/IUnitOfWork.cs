@@ -10,5 +10,6 @@ namespace RegistraWebApi.Persistance
     {
         IClientRepository Clients { get; }
         int SaveChanges();
+        Task<int> SaveChangesAsync();
     }
 }
