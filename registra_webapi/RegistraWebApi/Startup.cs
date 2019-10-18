@@ -30,6 +30,7 @@ namespace RegistraWebApi
         {
             services.AddDbContext<RegistraDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("RegistraConnectionStringDev")));
             services.AddScoped<IClientRepository, ClientRepository>();
+            services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddControllers();
             services.AddCors();

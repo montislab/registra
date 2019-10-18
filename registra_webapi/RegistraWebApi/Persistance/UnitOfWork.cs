@@ -10,12 +10,15 @@ namespace RegistraWebApi.Persistance
     {
         private readonly RegistraDbContext registraDbContext;
         public IClientRepository Clients { get; private set; }
+        public IAuthRepository AuthRepository { get; private set; }
 
         public UnitOfWork(RegistraDbContext registraDbContext,
-                          IClientRepository ClientRepository)
+                          IClientRepository clientRepository,
+                          IAuthRepository authRepository)
         {
             this.registraDbContext = registraDbContext;
-            Clients = ClientRepository;
+            Clients = clientRepository;
+            AuthRepository = authRepository;
         }
 
         public int SaveChanges()
