@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map } from 'rxjs/operators'
+import { map } from 'rxjs/operators';
 
 @Injectable({
-  providedIn: 'root' 
+  providedIn: 'root'
 })
 export class AuthService {
   baseUrl: string = 'http://localhost:5000/auth/';
@@ -19,5 +19,9 @@ export class AuthService {
         }
       })
     )
+  }
+
+  register(model: any) {
+    return this.http.post(this.baseUrl + 'register', model);
   }
 }

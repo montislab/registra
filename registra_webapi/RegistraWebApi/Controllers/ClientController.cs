@@ -22,6 +22,7 @@ namespace RegistraWebApi.Controllers
             this.unitOfWork = unitOfWork;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public IEnumerable<Client> Get()
         {
