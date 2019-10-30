@@ -9,59 +9,82 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Identity;
+using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RegistraWebApi.Controllers
 {
     [Route("[controller]")]
+    [AllowAnonymous]
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IUnitOfWork unitOfWork;
         private readonly IConfiguration config;
-        public AuthController(IUnitOfWork unitOfWork, IConfiguration config)
+        private readonly IMapper mapper;
+        private readonly UserManager<User> userManager;
+        private readonly SignInManager<User> signInManager;
+        public AuthController(IConfiguration config, IMapper mapper, UserManager<User> userManager, SignInManager<User> signInManager)
         {
-            this.unitOfWork = unitOfWork;
+            this.signInManager = signInManager;
+            this.userManager = userManager;
+            this.mapper = mapper;
             this.config = config;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserForRegisterDto userForRegisterDto)
         {
-            userForRegisterDto.LoginEmail = userForRegisterDto.LoginEmail.ToLower();
-
-            if (await unitOfWork.AuthRepository.UserExists(userForRegisterDto.LoginEmail))
-                return BadRequest("Username already exists");
-
-            var userToCreate = new User
+            //var userToCreate = mapper.Map<User>(userForRegisterDto);
+            User user = new User
             {
-                LoginEmail = userForRegisterDto.LoginEmail
+                UserName = userForRegisterDto.LoginEmail
             };
 
-            var createdUser = await unitOfWork.AuthRepository.Register(userToCreate, userForRegisterDto.Password);
-            await unitOfWork.SaveChangesAsync();
+            var result = await userManager.CreateAsync(user, userForRegisterDto.Password);
 
-            return StatusCode(201);
+            var userToReturn = mapper.Map<UserDto>(user);
+
+            // if(result.Succeeded)
+            // {
+            //     return CreatedAtRoute("GetUser", new { controller = "Users", id = user.Id, userToReturn});
+            // }
+
+            return BadRequest();
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
         {
-            var userFromRepo = await unitOfWork.AuthRepository.Login(userForLoginDto.LoginEmail.ToLower(), userForLoginDto.Password);
+            var user = await userManager.FindByNameAsync(userForLoginDto.LoginEmail);
+            var result = await signInManager.CheckPasswordSignInAsync(user, userForLoginDto.Password, false);
 
-            if(userFromRepo == null)
-                return Unauthorized();
-            
+            if(result.Succeeded)
+            {
+                var appUser = mapper.Map<UserForLoginDto>(user);
+
+                return Ok(new
+                {
+                    token = GenerateJwtToken(user),
+                    user = appUser
+                });
+            }
+            return Unauthorized();
+        }
+
+        private string GenerateJwtToken(User user)
+        {
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, userFromRepo.Id.ToString()),
-                new Claim(ClaimTypes.Name, userFromRepo.LoginEmail)
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.LoginEmail)
             };
 
             //TODO this token from appsettings.json file has to be changed before app publishing because of security reasons
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetSection("AppSettings:Token").Value));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-            
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
@@ -73,10 +96,7 @@ namespace RegistraWebApi.Controllers
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            return Ok(new {
-                token = tokenHandler.WriteToken(token)
-                });
+            return tokenHandler.WriteToken(token);
         }
-
     }
 }
