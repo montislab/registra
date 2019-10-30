@@ -23,8 +23,8 @@ namespace RegistraWebApi.Persistance.Repository
             byte[] passwordHash, passwordSalt;
             CreatePassowrdHash(password, out passwordHash, out passwordSalt);
 
-            user.PasswordHash = passwordHash;
-            user.PasswordSalt = passwordSalt;
+            //user.PasswordHash = passwordHash;
+            //user.PasswordSalt = passwordSalt;
 
             await RegistraDbContext.Users.AddAsync(user);
             //await RegistraDbContext.SaveChangesAsync();
@@ -48,8 +48,8 @@ namespace RegistraWebApi.Persistance.Repository
             if(user == null)
                 return null;
             
-            if(!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
-                return null;
+            //if(!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+            //    return null;
             
             return user;
         }

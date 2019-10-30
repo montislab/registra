@@ -10,7 +10,6 @@ using RegistraWebApi.Persistance;
 
 namespace RegistraWebApi.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class ClientController : ControllerBase
@@ -22,7 +21,6 @@ namespace RegistraWebApi.Controllers
             this.unitOfWork = unitOfWork;
         }
 
-        [AllowAnonymous]
         [HttpGet]
         public IEnumerable<Client> Get()
         {

@@ -4,16 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using RegistraWebApi.Models;
 using RegistraWebApi.Persistance;
 using RegistraWebApi.Persistance.Repository;
 
@@ -31,12 +35,21 @@ namespace RegistraWebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<RegistraDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("RegistraConnectionStringDev")));
-            services.AddScoped<IClientRepository, ClientRepository>();
-            services.AddScoped<IAuthRepository, AuthRepository>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddControllers();
-            services.AddCors();
+            //TODO: Password should be more complex
+            IdentityBuilder builder = services.AddIdentityCore<User>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequiredLength = 4;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+            });
+
+            builder = new IdentityBuilder(builder.UserType, typeof(Role), builder.Services);
+            builder.AddEntityFrameworkStores<RegistraDbContext>();
+            builder.AddRoleValidator<RoleValidator<Role>>();
+            builder.AddRoleManager<RoleManager<Role>>();
+            builder.AddSignInManager<SignInManager<User>>();
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => {
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -48,6 +61,25 @@ namespace RegistraWebApi
                         ValidateAudience = false
                     };
                 });
+
+            services.AddDbContext<RegistraDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("RegistraConnectionStringDev")));
+            services.AddScoped<IClientRepository, ClientRepository>();
+            services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            services.AddControllers();
+
+            //TODO: Check this part of code after finish Identity
+            services.AddMvc( options =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build();
+
+                options.Filters.Add(new AuthorizeFilter(policy));
+            })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

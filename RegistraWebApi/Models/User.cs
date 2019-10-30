@@ -1,10 +1,11 @@
+using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
+
 namespace RegistraWebApi.Models
 {
-    public class User
+    public class User : IdentityUser<int>
     {
-        public int Id { get; set; }
         public string LoginEmail { get; set; }
-        public byte[] PasswordHash { get; set; }
-        public byte[] PasswordSalt { get; set; }
+        public virtual ICollection<UserRole> UserRole { get; set; }
     }
 }
