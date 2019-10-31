@@ -8,7 +8,7 @@ namespace RegistraWebApi.Dtos
         [EmailAddress]
         public string LoginEmail { get; set; }
         [Required]
-        [StringLength(255, MinimumLength = 8, ErrorMessage = "Has³o musi zawieraæ co najminej 8 znaków.")]
+        [StringLength(255, MinimumLength = 4, ErrorMessage = "Hasï¿½o musi zawieraï¿½ co najminej 8 znakï¿½w.")]
         public string Password { get; set; }
     }
 }
