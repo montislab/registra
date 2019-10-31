@@ -35,20 +35,16 @@ namespace RegistraWebApi.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserForRegisterDto userForRegisterDto)
         {
-            //var userToCreate = mapper.Map<User>(userForRegisterDto);
-            User user = new User
+            var userToCreate = mapper.Map<User>(userForRegisterDto);
+
+            var result = await userManager.CreateAsync(userToCreate, userForRegisterDto.Password);
+
+            var userToReturn = mapper.Map<UserDto>(userToCreate);
+
+            if(result.Succeeded)
             {
-                UserName = userForRegisterDto.LoginEmail
-            };
-
-            var result = await userManager.CreateAsync(user, userForRegisterDto.Password);
-
-            var userToReturn = mapper.Map<UserDto>(user);
-
-            // if(result.Succeeded)
-            // {
-            //     return CreatedAtRoute("GetUser", new { controller = "Users", id = user.Id, userToReturn});
-            // }
+                return Ok(userToReturn);
+            }
 
             return BadRequest();
         }
@@ -61,7 +57,7 @@ namespace RegistraWebApi.Controllers
 
             if(result.Succeeded)
             {
-                var appUser = mapper.Map<UserForLoginDto>(user);
+                var appUser = mapper.Map<UserDto>(user);
 
                 return Ok(new
                 {
@@ -77,7 +73,7 @@ namespace RegistraWebApi.Controllers
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.LoginEmail)
+                new Claim(ClaimTypes.Name, user.UserName)
             };
 
             //TODO this token from appsettings.json file has to be changed before app publishing because of security reasons

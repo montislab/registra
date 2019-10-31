@@ -9,7 +9,6 @@ namespace RegistraWebApi.Persistance
     public interface IUnitOfWork : IDisposable
     {
         IClientRepository Clients { get; }
-        IAuthRepository AuthRepository { get; }
         int SaveChanges();
         Task<int> SaveChangesAsync();
     }
