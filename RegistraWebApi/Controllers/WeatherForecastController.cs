@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -24,16 +25,18 @@ namespace RegistraWebApi.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        [Authorize(Roles = "Admin")]
+        public  IActionResult GetValues()
         {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
+            return Ok(Summaries);
+            
+        }
+
+        [Authorize(Roles = "Client")]
+        [HttpGet("{id}")]
+        public  IActionResult Get(int id)
+        {
+            return Ok(Summaries[id]);
         }
     }
 }
