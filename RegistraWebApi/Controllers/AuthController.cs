@@ -54,18 +54,23 @@ namespace RegistraWebApi.Controllers
         public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
         {
             var user = await userManager.FindByNameAsync(userForLoginDto.LoginEmail);
-            var result = await signInManager.CheckPasswordSignInAsync(user, userForLoginDto.Password, false);
 
-            if(result.Succeeded)
+            if (user != null)
             {
-                var appUser = mapper.Map<UserDto>(user);
+                var result = await signInManager.CheckPasswordSignInAsync(user, userForLoginDto.Password, false);
 
-                return Ok(new
+                if (result.Succeeded)
                 {
-                    token = GenerateJwtToken(user),
-                    user = appUser
-                });
+                    var appUser = mapper.Map<UserDto>(user);
+
+                    return Ok(new
+                    {
+                        token = GenerateJwtToken(user),
+                        user = appUser
+                    });
+                }
             }
+
             return Unauthorized();
         }
 
