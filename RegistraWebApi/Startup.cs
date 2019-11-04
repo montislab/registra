@@ -18,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using RegistraWebApi.Constants;
 using RegistraWebApi.Controllers;
 using RegistraWebApi.Models;
 using RegistraWebApi.Persistance;
@@ -64,6 +65,12 @@ namespace RegistraWebApi
                         ValidateAudience = false
                     };
                 });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireAdminRole", policy => policy.RequireRole(RoleNames.Admin));
+                options.AddPolicy("ViewClientData", policy => policy.RequireRole(RoleNames.Admin, RoleNames.Client));
+            });
 
             services.AddDbContext<RegistraDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("RegistraConnectionStringDev")));
             services.AddScoped<IClientRepository, ClientRepository>();

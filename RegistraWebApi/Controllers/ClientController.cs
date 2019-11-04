@@ -21,6 +21,7 @@ namespace RegistraWebApi.Controllers
             this.unitOfWork = unitOfWork;
         }
 
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpGet]
         public IEnumerable<Client> Get()
         {
@@ -28,7 +29,7 @@ namespace RegistraWebApi.Controllers
             return result;
         }
 
-        [AllowAnonymous]
+        [Authorize(Policy = "ViewClientData")]
         [HttpGet("{id}")]
         public Client Get(int id)
         {
