@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using RegistraWebApi.Constants;
 
 namespace RegistraWebApi.Migrations
 {
@@ -6,7 +7,6 @@ namespace RegistraWebApi.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            const string admin = "Admin";
             const string montisMail = "montislabpoland@gmail.com";
 
             migrationBuilder.Sql("INSERT [dbo].[AspNetRoles] ([Name], [NormalizedName], [ConcurrencyStamp]) VALUES (N'Client', N'CLIENT', N'67ba544f-155c-4a2f-bf0f-b5349e806c16')");
@@ -17,7 +17,7 @@ namespace RegistraWebApi.Migrations
             migrationBuilder.Sql(
                 @$"INSERT [dbo].[AspNetUserRoles] ([UserId], [RoleId]) VALUES (
                 (select Id from AspNetUsers where UserName = '{montisMail}'),
-                (select Id from AspNetRoles where Name = '{admin}'))");
+                (select Id from AspNetRoles where Name = '{RoleNames.Admin}'))");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

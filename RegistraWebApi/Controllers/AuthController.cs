@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using System.Collections.Generic;
+using RegistraWebApi.Constants;
 
 namespace RegistraWebApi.Controllers
 {
@@ -36,18 +37,30 @@ namespace RegistraWebApi.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserForRegisterDto userForRegisterDto)
         {
-            var userToCreate = mapper.Map<User>(userForRegisterDto);
-
-            var result = await userManager.CreateAsync(userToCreate, userForRegisterDto.Password);
-
-            var userToReturn = mapper.Map<UserDto>(userToCreate);
+            User userToCreate = mapper.Map<User>(userForRegisterDto);
+            IdentityResult result = await userManager.CreateAsync(userToCreate, userForRegisterDto.Password);
+            UserDto userToReturn = mapper.Map<UserDto>(userToCreate);
 
             if(result.Succeeded)
             {
-                return Ok(userToReturn);
+                if (await AddNewUserToRole(userToCreate))
+                    return Ok(userToReturn);
+                else
+                    return StatusCode(500);
             }
 
             return BadRequest();
+        }
+
+        private async Task<bool> AddNewUserToRole(User userToCreate)
+        {
+            User newUser = await userManager.FindByNameAsync(userToCreate.UserName);
+
+            if (newUser != null &&
+                (await userManager.AddToRoleAsync(newUser, RoleNames.Client)).Succeeded)
+                return true;
+
+            return false;
         }
 
         [HttpPost("login")]
