@@ -68,8 +68,8 @@ namespace RegistraWebApi
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("RequireAdminRole", policy => policy.RequireRole(RoleNames.Admin));
-                options.AddPolicy("ViewClientData", policy => policy.RequireRole(RoleNames.Admin, RoleNames.Client));
+                options.AddPolicy(PolicyNames.RequireAdminRole, policy => policy.RequireRole(RoleNames.Admin));
+                options.AddPolicy(PolicyNames.ViewClientData, policy => policy.RequireRole(RoleNames.Admin, RoleNames.Client));
             });
 
             services.AddDbContext<RegistraDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("RegistraConnectionStringDev")));

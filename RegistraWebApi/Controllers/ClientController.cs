@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using RegistraWebApi.Constants;
 using RegistraWebApi.Models;
 using RegistraWebApi.Persistance;
 
@@ -21,7 +22,7 @@ namespace RegistraWebApi.Controllers
             this.unitOfWork = unitOfWork;
         }
 
-        [Authorize(Policy = "RequireAdminRole")]
+        [Authorize(Policy = PolicyNames.RequireAdminRole)]
         [HttpGet]
         public IEnumerable<Client> Get()
         {
@@ -29,7 +30,7 @@ namespace RegistraWebApi.Controllers
             return result;
         }
 
-        [Authorize(Policy = "ViewClientData")]
+        [Authorize(Policy = PolicyNames.ViewClientData)]
         [HttpGet("{id}")]
         public Client Get(int id)
         {
