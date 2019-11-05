@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using RegistraWebApi.Constants;
 using RegistraWebApi.Dtos;
+using RegistraWebApi.Exceptions;
 using RegistraWebApi.Services;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -31,7 +31,7 @@ namespace RegistraWebApi.Controllers
             {
                 return Ok(await adminService.EditRoles(roleEditDto));
             }
-            catch (Exception ex)
+            catch (BadRequestException ex)
             {
                 return BadRequest(ex.Message);
             }

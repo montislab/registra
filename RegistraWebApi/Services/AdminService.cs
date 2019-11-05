@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegistraWebApi.Dtos;
+using RegistraWebApi.Exceptions;
 using RegistraWebApi.Models;
 
 namespace RegistraWebApi.Services
@@ -38,24 +39,24 @@ namespace RegistraWebApi.Services
             User user = await userManager.FindByNameAsync(roleEditDto.UserName);
 
             if (user == null)
-                throw new ArgumentException("User not exist");
+                throw new BadRequestException("User not exist");
 
             IList<string> userRoles = await userManager.GetRolesAsync(user);
             string[] selectedRoles = roleEditDto.RoleNames ?? new string[] { };
             List<string> availableRoles = roleManager.Roles.Select(r => r.Name).ToList();
 
             if (selectedRoles.Any(r => !availableRoles.Contains(r)))
-                throw new ArgumentException("Invalid roles");
+                throw new BadRequestException("Invalid roles");
 
             IdentityResult result = await userManager.AddToRolesAsync(user, selectedRoles.Except(userRoles));
 
             if (!result.Succeeded)
-                throw new Exception("Fail to add to roles");
+                throw new BadRequestException("Fail to add to roles");
 
             result = await userManager.RemoveFromRolesAsync(user, userRoles.Except(selectedRoles));
 
             if (!result.Succeeded)
-                throw new Exception("Fail to remove from roles");
+                throw new BadRequestException("Fail to remove from roles");
 
             return await userManager.GetRolesAsync(user);
         }
