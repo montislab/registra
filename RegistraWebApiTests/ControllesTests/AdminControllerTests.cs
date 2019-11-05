@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using FluentAssertions;
+using Microsoft.AspNetCore.Identity;
 using RegistraWebApi.Controllers;
 using RegistraWebApi.Models;
 using RegistraWebApi.Services;
@@ -17,7 +18,9 @@ namespace RegistraWebApiTests.ControllesTests
             IAdminService adminService = null;  //TODO: create real service
             AdminController adminController = new AdminController(adminService);
 
-            Assert.NotNull(adminController);
+            adminController
+                .Should()
+                .NotBeNull();
         }
     }
 }
