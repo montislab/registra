@@ -23,6 +23,7 @@ using RegistraWebApi.Controllers;
 using RegistraWebApi.Models;
 using RegistraWebApi.Persistance;
 using RegistraWebApi.Persistance.Repository;
+using RegistraWebApi.Services;
 
 namespace RegistraWebApi
 {
@@ -75,6 +76,7 @@ namespace RegistraWebApi
             services.AddDbContext<RegistraDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("RegistraConnectionStringDev")));
             services.AddScoped<IClientRepository, ClientRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IAdminService, AdminService>();
 
             services.AddControllers();
 

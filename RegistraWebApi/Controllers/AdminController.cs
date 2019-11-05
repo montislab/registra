@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using RegistraWebApi.Constants;
 using RegistraWebApi.Dtos;
-using RegistraWebApi.Models;
+using RegistraWebApi.Services;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace RegistraWebApi.Controllers
@@ -15,60 +13,28 @@ namespace RegistraWebApi.Controllers
     [ApiController]
     public class AdminController : ControllerBase
     {
-        private readonly UserManager<User> userManager;
-        private readonly RoleManager<Role> roleManager;
+        private readonly IAdminService adminService;
 
-        public AdminController(UserManager<User> userManager, RoleManager<Role> roleManager)
-        {
-            this.userManager = userManager;
-            this.roleManager = roleManager;
-        }
+        public AdminController(IAdminService adminService) => this.adminService = adminService;
 
         [Authorize(Policy = PolicyNames.RequireAdminRole)]
         [HttpGet("getUsersWithRoles")]
         public async Task<IActionResult> GetUsersWithRoles() => Ok(await PrepareUsersWithRoles());
 
-        private async Task<List<UserWithRolesDto>> PrepareUsersWithRoles()
-        {
-            return await userManager.Users
-                .OrderBy(u => u.Id)
-                .Select(user => new UserWithRolesDto
-                {
-                    Id = user.Id,
-                    UserName = user.UserName,
-                    Roles = userManager.GetRolesAsync(user).Result
-                }).ToListAsync();
-        }
+        private async Task<List<UserWithRolesDto>> PrepareUsersWithRoles() => await adminService.PrepareUsersWithRoles();
 
         [Authorize(Policy = PolicyNames.RequireAdminRole)]
         [HttpPost("editRoles")]
         public async Task<IActionResult> EditRoles(RoleEditDto roleEditDto)
         {
-            User user = await userManager.FindByNameAsync(roleEditDto.UserName);
-
-            if (user != null)
+            try
             {
-                IList<string> userRoles = await userManager.GetRolesAsync(user);
-                string[] selectedRoles = roleEditDto.RoleNames ?? new string[] { };
-                List<string> availableRoles = roleManager.Roles.Select(r => r.Name).ToList();
-
-                if (selectedRoles.Any(r => !availableRoles.Contains(r)))
-                    return BadRequest("Invalid roles");
-
-                IdentityResult result = await userManager.AddToRolesAsync(user, selectedRoles.Except(userRoles));
-
-                if (!result.Succeeded)
-                    return BadRequest("Fail to add to roles");
-
-                result = await userManager.RemoveFromRolesAsync(user, userRoles.Except(selectedRoles));
-
-                if (!result.Succeeded)
-                    return BadRequest("Fail to remove from roles");
-
-                return Ok(await userManager.GetRolesAsync(user));
+                return Ok(await adminService.EditRoles(roleEditDto));
             }
-
-            return BadRequest("User not exist");
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
