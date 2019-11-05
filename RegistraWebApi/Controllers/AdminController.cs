@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RegistraWebApi.Constants;
 using RegistraWebApi.Dtos;
 using RegistraWebApi.Models;
 using System.Collections.Generic;
@@ -21,8 +22,8 @@ namespace RegistraWebApi.Controllers
             this.userManager = userManager;
         }
 
-        [Authorize(Policy = "RequireAdminRole")]
-        [HttpGet("usersWithRoles")]
+        [Authorize(Policy = PolicyNames.RequireAdminRole)]
+        [HttpGet("getUsersWithRoles")]
         public async Task<IActionResult> GetUsersWithRoles() => Ok(await PrepareUsersWithRoles());
 
         private async Task<List<UserWithRolesDto>> PrepareUsersWithRoles()
@@ -35,6 +36,32 @@ namespace RegistraWebApi.Controllers
                     UserName = user.UserName,
                     Roles = userManager.GetRolesAsync(user).Result
                 }).ToListAsync();
+        }
+
+        [Authorize(Policy = PolicyNames.RequireAdminRole)]
+        [HttpPost("editRoles")]
+        public async Task<IActionResult> EditRoles(RoleEditDto roleEditDto)
+        {
+            User user = await userManager.FindByNameAsync(roleEditDto.UserName);
+
+            if (user != null)
+            {
+                IList<string> userRoles = await userManager.GetRolesAsync(user);
+                string[] selectedRoles = roleEditDto.RoleNames ?? new string[] { };
+                IdentityResult result = await userManager.AddToRolesAsync(user, selectedRoles.Except(userRoles));
+
+                if (!result.Succeeded)
+                    return BadRequest("Fail to add to roles");
+
+                result = await userManager.RemoveFromRolesAsync(user, userRoles.Except(selectedRoles));
+
+                if (!result.Succeeded)
+                    return BadRequest("Fail to remove from roles");
+
+                return Ok(await userManager.GetRolesAsync(user));
+            }
+
+            return BadRequest("User not exist");
         }
     }
 }
