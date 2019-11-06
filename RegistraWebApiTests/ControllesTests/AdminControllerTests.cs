@@ -10,6 +10,7 @@ using RegistraWebApi.Constants;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace RegistraWebApiTests.ControllesTests
 {
@@ -120,6 +121,57 @@ namespace RegistraWebApiTests.ControllesTests
                     }
                 }
             };
+        }
+
+        [Fact]
+        public void MoveUserFromOldToNewRole_ReturnsNewRoleOfUser()
+        {
+            RoleEditDto roleEditDto = new RoleEditDto()
+            {
+                UserName = "testc@test.com",
+                RoleNames = new string[]
+                {
+                    RoleNames.Client
+                }
+            };
+
+            Mock<UserManager<User>> userManagerMock = PrepareUserManagerMock();
+            userManagerMock.Setup(f => f.FindByNameAsync(It.IsAny<string>()))
+                .Returns(Task.FromResult(new User { UserName = roleEditDto.UserName }));
+            userManagerMock.SetupSequence(f => f.GetRolesAsync(It.IsAny<User>()))
+                .Returns(Task.FromResult(new List<string>() { RoleNames.Admin } as IList<string>))
+                .Returns(Task.FromResult(new List<string>() { RoleNames.Client } as IList<string>));
+            userManagerMock.Setup(f => f.AddToRolesAsync(It.IsAny<User>(), new List<string>() { RoleNames.Client }))
+                .Returns(Task.FromResult(IdentityResult.Success));
+            userManagerMock.Setup(f => f.RemoveFromRolesAsync(It.IsAny<User>(), new List<string>() { RoleNames.Admin }))
+                .Returns(Task.FromResult(IdentityResult.Success));
+
+            Mock<RoleManager<Role>> roleManagerMock = PrepareRoleManagerMock();
+            roleManagerMock.SetupGet(p => p.Roles).Returns(
+                new List<Role>()
+                {
+                    new Role() {Name = RoleNames.Client},
+                    new Role() {Name = RoleNames.Admin}
+                }.AsQueryable());
+
+            Mock<AdminService> adminServiceMock = new Mock<AdminService>(userManagerMock.Object, roleManagerMock.Object);
+            AdminController adminController = new AdminController(adminServiceMock.Object);
+
+            IActionResult result = adminController.EditRoles(roleEditDto).Result;
+
+            result
+                .Should()
+                .BeOfType<OkObjectResult>();
+
+            OkObjectResult okObjectResult = result as OkObjectResult;
+            okObjectResult.Value
+                .Should()
+                .BeEquivalentTo(new List<string>() { RoleNames.Client });
+
+            userManagerMock.Verify(f => f.FindByNameAsync(roleEditDto.UserName), Times.Once);
+            userManagerMock.Verify(f => f.GetRolesAsync(It.IsAny<User>()), Times.Exactly(2));
+            userManagerMock.Verify(f => f.AddToRolesAsync(It.IsAny<User>(), new List<string>() { RoleNames.Client }), Times.Once);
+            userManagerMock.Verify(f => f.RemoveFromRolesAsync(It.IsAny<User>(), new List<string>() { RoleNames.Admin }), Times.Once);
         }
     }
 }

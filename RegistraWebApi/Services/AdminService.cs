@@ -50,12 +50,12 @@ namespace RegistraWebApi.Services
 
             IdentityResult result = await userManager.AddToRolesAsync(user, selectedRoles.Except(userRoles));
 
-            if (!result.Succeeded)
+            if (result == null || !result.Succeeded)
                 throw new BadRequestException("Fail to add to roles");
 
             result = await userManager.RemoveFromRolesAsync(user, userRoles.Except(selectedRoles));
 
-            if (!result.Succeeded)
+            if (result == null || !result.Succeeded)
                 throw new BadRequestException("Fail to remove from roles");
 
             return await userManager.GetRolesAsync(user);
