@@ -1,16 +1,13 @@
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">
   <div class="container">
 
-    <a class="navbar-brand" href="#">Registra</a>
+    <a class="navbar-brand" [routerLink]="['/home']">Registra</a>
     <ul *ngIf="loggedIn()" class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="#">Registers</a>
+      <li class="nav-item" routerLinkActive="active">
+        <a class="nav-link" [routerLink]="['/companies-list']">Companies list</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Dates</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Messages</a>
+      <li class="nav-item" routerLinkActive="active">
+        <a class="nav-link" [routerLink]="['/user-management']">User management</a>
       </li>
     </ul>
 
