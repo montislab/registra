@@ -5,6 +5,7 @@ import { CompaniesListComponent } from './administration/companies-list/companie
 import { UserManagementComponent } from './administration/user-management/user-management.component';
 import { AuthGuard } from './_guards/auth.guard';
 import { AuthService } from './services/auth.service';
+import { AdminPanelComponent } from './administration/admin-panel/admin-panel.component';
 
 
 const routes: Routes = [
@@ -15,8 +16,7 @@ const routes: Routes = [
     runGuardsAndResolvers: 'always',
     canActivate: [AuthGuard],
     children: [
-      { path: 'companies-list', component: CompaniesListComponent },
-      { path: 'user-management', component: UserManagementComponent }
+      { path: 'admin', component: AdminPanelComponent, data: {roles: ['Admin']}}
     ]
   },
 

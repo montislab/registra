@@ -3,12 +3,15 @@
 
     <a class="navbar-brand" [routerLink]="['/home']">Registra</a>
     <ul *ngIf="loggedIn()" class="navbar-nav mr-auto">
-      <li class="nav-item" routerLinkActive="active">
+      <li *appHasRole="['Admin']" class="nav-item" routerLinkActive="active">
+            <a class="nav-link" [routerLink]="['/admin']">Administration panel</a>
+          </li>
+      <!-- <li class="nav-item" routerLinkActive="active">
         <a class="nav-link" [routerLink]="['/companies-list']">Companies list</a>
       </li>
       <li class="nav-item" routerLinkActive="active">
         <a class="nav-link" [routerLink]="['/user-management']">User management</a>
-      </li>
+      </li> -->
     </ul>
 
     <div *ngIf="loggedIn()" class="dropdown" dropdown>
