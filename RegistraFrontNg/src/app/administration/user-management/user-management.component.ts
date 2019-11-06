@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { User } from 'src/app/models/user';
 import { AdminService } from 'src/app/services/admin.service';
-import { BsModalService, BsModalRef } from 'ngx-bootstrap';
+import { BsModalService, BsModalRef, enGbLocale } from 'ngx-bootstrap';
 import { RolesModalComponent } from '../roles-modal/roles-modal.component';
 
 @Component({
@@ -34,7 +34,18 @@ export class UserManagementComponent implements OnInit {
         roles: this.getRolesArray(user)
     };
     this.bsModalRef = this.modalService.show(RolesModalComponent, { initialState });
-    this.bsModalRef.content.closeBtnName = 'Close';
+    this.bsModalRef.content.updateSelectedRoles.subscribe((values) => {
+      const rolesToUpdate = {
+        rolesNames: [...values.filter(el => el.checked === true).map(el => el.name)]
+      };
+      if (rolesToUpdate) {
+        this.adminService.updateUserRoles(user, rolesToUpdate).subscribe(() => {
+          user.roles = [...rolesToUpdate.rolesNames];
+        }, error => {
+          console.log(error);
+        });
+      }
+    });
   }
 
   private getRolesArray(user) {
