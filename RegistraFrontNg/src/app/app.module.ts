@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
-import { BsDropdownModule, TabsModule } from 'ngx-bootstrap';
+import { BsDropdownModule, TabsModule, ModalModule } from 'ngx-bootstrap';
 import { JwtModule } from '@auth0/angular-jwt';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -17,6 +17,7 @@ import { AdminPanelComponent } from './administration/admin-panel/admin-panel.co
 import { HasRoleDirective } from './_directives/hasRole.directive';
 import { NotificationService } from './services/notification.service';
 import { AdminService } from './services/admin.service';
+import { RolesModalComponent } from './administration/roles-modal/roles-modal.component';
 
 export function tokenGetter() {
    return localStorage.getItem('token');
@@ -31,7 +32,8 @@ export function tokenGetter() {
       CompaniesListComponent,
       UserManagementComponent,
       AdminPanelComponent,
-      HasRoleDirective
+      HasRoleDirective,
+      RolesModalComponent
    ],
    imports: [
       BrowserModule,
@@ -46,12 +48,16 @@ export function tokenGetter() {
             whitelistedDomains: ['localhost:5000'],
             blacklistedRoutes: ['localhost:5000/api/auth']
          }
-      })
+      }),
+      ModalModule.forRoot()
    ],
    providers: [
       AuthService,
       NotificationService,
       AdminService
+   ],
+   entryComponents: [
+      RolesModalComponent
    ],
    bootstrap: [
       AppComponent
