@@ -1,9 +1,12 @@
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
+const apiSocket = 'localhost:5000';
 
 export const environment = {
-  production: false
+  production: false,
+  apiSocket, // configuration of HtttpInterceptor (JWT auto attaching) expect it instead of full api url
+  apiUrl: 'http://' + apiSocket + '/'
 };
 
 /*

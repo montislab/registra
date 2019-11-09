@@ -18,6 +18,7 @@ import { HasRoleDirective } from './_directives/hasRole.directive';
 import { NotificationService } from './services/notification.service';
 import { AdminService } from './services/admin.service';
 import { RolesModalComponent } from './administration/roles-modal/roles-modal.component';
+import { environment } from 'src/environments/environment';
 
 export function tokenGetter() {
    return localStorage.getItem('token');
@@ -44,9 +45,9 @@ export function tokenGetter() {
       TabsModule.forRoot(),
       JwtModule.forRoot({
          config: {
-            tokenGetter: tokenGetter,
-            whitelistedDomains: ['localhost:5000'],
-            blacklistedRoutes: ['localhost:5000/auth']
+            tokenGetter,
+            whitelistedDomains: [environment.apiSocket],
+            blacklistedRoutes: [environment.apiSocket + '/auth']
          }
       }),
       ModalModule.forRoot()
