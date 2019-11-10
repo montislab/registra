@@ -19,9 +19,7 @@ namespace RegistraWebApi.Controllers
 
         [Authorize(Policy = PolicyNames.RequireAdminRole)]
         [HttpGet("getUsersWithRoles")]
-        public async Task<IActionResult> GetUsersWithRoles() => Ok(await PrepareUsersWithRoles());
-
-        private async Task<List<UserWithRolesDto>> PrepareUsersWithRoles() => await adminService.PrepareUsersWithRoles();
+        public async Task<IActionResult> GetUsersWithRoles() => Ok(await adminService.PrepareUsersWithRoles());
 
         [Authorize(Policy = PolicyNames.RequireAdminRole)]
         [HttpPost("editRoles")]

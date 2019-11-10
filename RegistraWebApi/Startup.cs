@@ -76,6 +76,7 @@ namespace RegistraWebApi
             services.AddDbContext<RegistraDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("RegistraConnectionStringDev")));
             services.AddScoped<IClientRepository, ClientRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IAdminService, AdminService>();
 
             services.AddControllers();

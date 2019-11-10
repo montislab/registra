@@ -38,22 +38,28 @@ namespace RegistraWebApi.Services
         {
             User user = await userManager.FindByNameAsync(roleEditDto.UserName);
 
-            if (user == null)
+            if (user is null)
                 throw new BadRequestException("User not exist");
 
-            IList<string> userRoles = await userManager.GetRolesAsync(user);
-            string[] selectedRoles = roleEditDto.RoleNames ?? new string[] { };
+            IList<string> currentRoles = await userManager.GetRolesAsync(user);
+            string[] newRoles = roleEditDto.RoleNames ?? new string[] { };
             List<string> availableRoles = roleManager.Roles.Select(r => r.Name).ToList();
 
-            if (selectedRoles.Any(r => !availableRoles.Contains(r)))
+            return await PerformRolesEdit(user, currentRoles, newRoles, availableRoles);
+        }
+
+        private async Task<IList<string>> PerformRolesEdit(User user, IList<string> currentRoles, string[] newRoles, List<string> availableRoles = null)
+        {
+            if (availableRoles != null &&
+                newRoles.Any(r => !availableRoles.Contains(r)))
                 throw new BadRequestException("Invalid roles");
 
-            IdentityResult result = await userManager.AddToRolesAsync(user, selectedRoles.Except(userRoles));
+            IdentityResult result = await userManager.AddToRolesAsync(user, newRoles.Except(currentRoles));
 
             if (!result.Succeeded)
                 throw new BadRequestException("Fail to add to roles");
 
-            result = await userManager.RemoveFromRolesAsync(user, userRoles.Except(selectedRoles));
+            result = await userManager.RemoveFromRolesAsync(user, currentRoles.Except(newRoles));
 
             if (!result.Succeeded)
                 throw new BadRequestException("Fail to remove from roles");

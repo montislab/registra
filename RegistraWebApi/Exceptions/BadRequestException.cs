@@ -13,6 +13,9 @@ namespace RegistraWebApi.Exceptions
             BadRequestInfo = message;
         }
 
-        public BadRequestException(string message, System.Exception inner) : base(message, inner) { }
+        public BadRequestException(string message, System.Exception inner) : base(message, inner)
+        {
+            BadRequestInfo = message;
+        }
     }
 }
