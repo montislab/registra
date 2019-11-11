@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using RegistraWebApi.Persistance.Repository;
 
 namespace RegistraWebApi.Persistance.Repository
 {

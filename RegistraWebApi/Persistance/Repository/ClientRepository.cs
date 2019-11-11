@@ -1,9 +1,6 @@
 ﻿using RegistraWebApi.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using RegistraWebApi.Persistance.Repository;
 
 namespace RegistraWebApi.Persistance.Repository
 {
